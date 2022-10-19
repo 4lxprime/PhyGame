@@ -61,11 +61,11 @@ class Player(FirstPersonController):
         super().__init__(
             position=position,
             model="cube",
-            jump_height=2.5,
-            jump_duration=0.4,
+            jump_height=2,
+            jump_duration=0.25,
             origin_y=-2,
             collider="box",
-            speed=7
+            speed=10
         )
         self.cursor.color=ursina.color.rgb(255, 0, 0, 122)
 
@@ -125,7 +125,7 @@ class Player(FirstPersonController):
 
 class Bullet(ursina.Entity):
     def __init__(self, position: ursina.Vec3, direction: float, x_direction: float, network, damage: int=random.randint(5, 20), slave=False):
-        speed=50
+        speed=100
         dir_rad=ursina.math.radians(direction)
         x_dir_rad=ursina.math.radians(x_direction)
 
@@ -139,7 +139,7 @@ class Bullet(ursina.Entity):
             position=position+self.velocity / speed,
             model="sphere",
             collider="box",
-            scale=0.2
+            scale=0.1
         )
 
         self.damage=damage
@@ -288,9 +288,9 @@ class FloorCube(ursina.Entity):
 class Floor:
     def __init__(self):
         dark1=True
-        for z in range(-20, 20, 2):
+        for z in range(-30, 30, 2):
             dark2=not dark1
-            for x in range(-20, 20, 2):
+            for x in range(-30, 30, 2):
                 cube=FloorCube(ursina.Vec3(x, 0, z))
                 if dark2:
                     cube.color=ursina.color.color(0, 0.2, 0.8)
@@ -301,11 +301,11 @@ class Floor:
 
 
 
-username=input("Enter your username: ")
+username="test"
 
 while True:
-    server_addr=input("Enter server IP: ")
-    server_port=input("Enter server port: ")
+    server_addr=input("server address: ")
+    server_port=8000
 
     try:
         server_port=int(server_port)
@@ -339,13 +339,14 @@ app=ursina.Ursina()
 ursina.window.borderless=False
 ursina.window.title="Ursina FPS"
 ursina.window.exit_button.visible=False
+ursina.camera.fov=120
 
 floor=Floor()
 map=Map()
 sky=ursina.Entity(
     model="sphere",
     texture=os.path.join("assets", "sky.png"),
-    scale=9999,
+    scale=200,
     double_sided=True
 )
 player=Player(ursina.Vec3(0, 1, 0))
@@ -433,10 +434,18 @@ def update():
 
 def input(key):
     if key=="left mouse down" and player.health > 0:
+        ursina.Audio("assets/gunshot.mp3")
         b_pos=player.position+ursina.Vec3(0, 2, 0)
         bullet=Bullet(b_pos, player.world_rotation_y, -player.camera_pivot.world_rotation_x, n)
         n.send_bullet(bullet)
         ursina.destroy(bullet, delay=2)
+    
+    if key=="h":
+        ursina.Text(
+            text="test",
+            origin=ursina.Vec2(0, 0),
+            scale=3
+        )
 
 
 def main():
