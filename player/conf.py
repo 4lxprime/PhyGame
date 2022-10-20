@@ -11,5 +11,5 @@ class bullet():
 class map():
     scale=9999
     texture="assets/sky.png"
-    floor_texture="assets/floor.png"
-    wall_texture="assets/wall.png"
+    floor_texture="white_cube" #"assets/floor.png"
+    wall_texture="white_cube" #"assets/wall.png"

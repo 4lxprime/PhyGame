@@ -273,6 +273,35 @@ class Map:
             Wall(ursina.Vec3(2, y, 8))
             Wall(ursina.Vec3(0, y, 8))
             Wall(ursina.Vec3(-2, y, 8))
+            
+            Wall(ursina.Vec3(4, y, 14))
+            Wall(ursina.Vec3(2, y, 14))
+            Wall(ursina.Vec3(0, y, 14))
+            Wall(ursina.Vec3(-2, y, 14))
+            
+            Wall(ursina.Vec3(0, y, -8))
+            Wall(ursina.Vec3(-2, y, -8))
+            Wall(ursina.Vec3(-4, y, -8))
+            Wall(ursina.Vec3(-6, y, -8))
+            Wall(ursina.Vec3(-8, y, -8))
+            
+            Wall(ursina.Vec3(14, y, 2))
+            Wall(ursina.Vec3(14, y, 4))
+            Wall(ursina.Vec3(14, y, 6))
+            Wall(ursina.Vec3(14, y, 8))
+            Wall(ursina.Vec3(14, y, 10))
+            
+            Wall(ursina.Vec3(-14, y, 2))
+            Wall(ursina.Vec3(-14, y, 4))
+            Wall(ursina.Vec3(-14, y, 6))
+            Wall(ursina.Vec3(-14, y, 8))
+            Wall(ursina.Vec3(-14, y, 10))
+            
+            Wall(ursina.Vec3(-14, y, -4))
+            Wall(ursina.Vec3(-14, y, -6))
+            Wall(ursina.Vec3(-14, y, -8))
+            Wall(ursina.Vec3(-14, y, -10))
+            Wall(ursina.Vec3(-14, y, -12))
 
 class FloorCube(ursina.Entity):
     def __init__(self, position):
@@ -288,10 +317,10 @@ class FloorCube(ursina.Entity):
 
 class Floor:
     def __init__(self):
-        for z in range(-20, 20, 1):
-            for x in range(-20, 20, 1):
+        for z in range(-20, 20, 2):
+            for x in range(-20, 20, 2):
                 cube=FloorCube(ursina.Vec3(x, 0, z))
-                cube.color=ursina.color.color(0, 0.2, 1)
+                cube.color=ursina.color.color(0, 0.2, 2)
 
 
 
