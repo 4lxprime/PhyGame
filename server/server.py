@@ -53,8 +53,6 @@ def handle_messages(identifier: str):
             print(e)
             continue
 
-        print(f"Received message from player {username} with ID {identifier}")
-
         if msg_json["object"] == "player":
             players[identifier]["position"] = msg_json["position"]
             players[identifier]["rotation"] = msg_json["rotation"]
