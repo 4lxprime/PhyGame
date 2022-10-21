@@ -23,6 +23,7 @@ class Server():
         self.s.bind((self.ADDR, self.PORT))
         self.s.listen(self.MAX_PLAYERS)
         self.players = {}
+        self.main()
 
 
     def generate_id(self, player_list: dict, max_players: int):
@@ -133,6 +134,100 @@ class Server():
                         time.sleep(0.1)
                     except OSError:
                         pass
+
+            self.players[new_id] = new_player_info
+
+            msg_thread = threading.Thread(target=self.handle_messages, args=(new_id,), daemon=True)
+            msg_thread.start()
+
+            print(f"New connection from {addr}, assigned ID: {new_id}...")
+
+class Bullet_Server():
+    def __init__(self):
+        self.ADDR="0.0.0.0"
+        self.PORT=8001
+        self.MAX_PLAYERS = 10
+        self.MSG_SIZE = 2048
+        self.s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.bind((self.ADDR, self.PORT))
+        self.s.listen(self.MAX_PLAYERS)
+        self.players = {}
+        self.main()
+
+
+    def generate_id(self, player_list: dict, max_players: int):
+        while True:
+            unique_id = str(random.randint(1, max_players))
+            if unique_id not in player_list:
+                return unique_id
+
+
+    def handle_messages(self, identifier: str):
+        client_info = self.players[identifier]
+        conn: socket.socket = client_info["socket"]
+        username = client_info["username"]
+
+        while True:
+            try:
+                msg = conn.recv(self.MSG_SIZE)
+            except ConnectionResetError:
+                break
+
+            if not msg:
+                break
+
+            msg_decoded = msg.decode("utf8")
+
+            try:
+                left_bracket_index = msg_decoded.index("{")
+                right_bracket_index = msg_decoded.index("}") + 1
+                msg_decoded = msg_decoded[left_bracket_index:right_bracket_index]
+            except ValueError:
+                continue
+
+            try:
+                msg_json = json.loads(msg_decoded)
+            except Exception as e:
+                print(e)
+                continue
+
+            if msg_json["object"] == "player":
+                self.players[identifier]["position"] = msg_json["position"]
+                self.players[identifier]["rotation"] = msg_json["rotation"]
+                self.players[identifier]["health"] = msg_json["health"]
+
+            for player_id in self.players:
+                if player_id != identifier:
+                    player_info = self.players[player_id]
+                    player_conn: socket.socket = player_info["socket"]
+                    try:
+                        player_conn.sendall(msg_decoded.encode("utf8"))
+                    except OSError:
+                        pass
+
+        for player_id in self.players:
+            if player_id != identifier:
+                player_info = self.players[player_id]
+                player_conn: socket.socket = player_info["socket"]
+                try:
+                    player_conn.send(json.dumps({"id": identifier, "object": "player", "joined": False, "left": True}).encode("utf8"))
+                except OSError:
+                    pass
+
+        print(f"Player {username} with ID {identifier} has left the game...")
+        del self.players[identifier]
+        conn.close()
+
+
+    def main(self):
+        print("Server started, listening for new connections...")
+
+        while True:
+            conn, addr = self.s.accept()
+            new_id =self.generate_id(self.players, self.MAX_PLAYERS)
+            conn.send(new_id.encode("utf8"))
+            username = conn.recv(self.MSG_SIZE).decode("utf8")
+            new_player_info = {"socket": conn, "username": username, "position": (0, 1, 0), "rotation": 0, "health": 100}
 
             self.players[new_id] = new_player_info
 
@@ -272,6 +367,22 @@ def ConnPS():
     else:
         canvas.itemconfigure(MSTxt, text=f"Error")
 
+def HSPRV():
+    t0=threading.Thread(target=Server)
+    t0.setDaemon(True)
+    t0.start()
+    t1=threading.Thread(target=Bullet_Server)
+    t1.setDaemon(True)
+    t1.start()
+    
+def HSPUB():
+    t0=threading.Thread(target=Server)
+    t0.setDaemon(True)
+    t0.start()
+    t1=threading.Thread(target=Bullet_Server)
+    t1.setDaemon(True)
+    t1.start()
+
 But1B=Button(root, 
     font=("Arial", 20), 
     relief="flat", borderwidth=0, 
@@ -372,7 +483,8 @@ HostPub=canvas.create_window(root.winfo_width()/2-160, root.winfo_height()/2,
         highlightbackground='black', 
         fg="white", 
         text="Host Public Game",
-        state="normal"
+        state="normal",
+        command=HSPUB
     )
 )
 
@@ -387,12 +499,13 @@ HostPrv=canvas.create_window(root.winfo_width()/2+160, root.winfo_height()/2,
         highlightbackground='black', 
         fg="white", 
         text="Host Private Game",
-        state="normal"
+        state="normal",
+        command=HSPRV
     )
 )
 
 Ti=canvas.create_text(root.winfo_width()/2, root.winfo_height()/2, 
-    text="Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla\nBla Bla Bla Bla Bla Bla Bla Bla Bla Bla\nBla Bla Bla Bla Bla Bla Bla Bla Bla Bla\nBla Bla Bla Bla Bla Bla Bla Bla Bla Bla", 
+    text="PhyGame is a free multiplayer FPS\n(First Person Shooter) game\ndeveloped by 4lxprime", 
     font=("Arial", 25), 
     fill="white",
     state="normal"

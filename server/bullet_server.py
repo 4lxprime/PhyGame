@@ -59,6 +59,16 @@ def handle_messages(identifier: str):
             players[identifier]["rotation"] = msg_json["rotation"]
             players[identifier]["health"] = msg_json["health"]
 
+        # Tell other players about player moving
+        for player_id in players:
+            if player_id != identifier:
+                player_info = players[player_id]
+                player_conn: socket.socket = player_info["socket"]
+                try:
+                    player_conn.sendall(msg_decoded.encode("utf8"))
+                except OSError:
+                    pass
+
     # Tell other players about player leaving
     for player_id in players:
         if player_id != identifier:
@@ -78,17 +88,14 @@ def main():
     print("Server started, listening for new connections...")
 
     while True:
-        # Accept new connection and assign unique ID
         conn, addr = s.accept()
         new_id = generate_id(players, MAX_PLAYERS)
         conn.send(new_id.encode("utf8"))
         username = conn.recv(MSG_SIZE).decode("utf8")
         new_player_info = {"socket": conn, "username": username, "position": (0, 1, 0), "rotation": 0, "health": 100}
 
-        # Add new player to players list, effectively allowing it to receive messages from other players
         players[new_id] = new_player_info
 
-        # Start thread to receive messages from client
         msg_thread = threading.Thread(target=handle_messages, args=(new_id,), daemon=True)
         msg_thread.start()
 

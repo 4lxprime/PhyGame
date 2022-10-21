@@ -400,13 +400,15 @@ def bullet_receive():
             sys.exit()
         
         if info["object"]=="bullet":
-                ursina.Audio("assets/gunshot.mp3")
-                b_pos=ursina.Vec3(*info["position"])
-                b_dir=info["direction"]
-                b_x_dir=info["x_direction"]
-                b_damage=info["damage"]
-                new_bullet=Bullet(b_pos, b_dir, b_x_dir, n, b_damage, slave=True)
-                ursina.destroy(new_bullet, delay=2)
+            ursina.Audio("assets/gunshot.mp3")
+            b_pos=ursina.Vec3(*info["position"])
+            b_dir=info["direction"]
+            b_x_dir=info["x_direction"]
+            b_damage=info["damage"]
+            new_bullet=Bullet(b_pos, b_dir, b_x_dir, n, b_damage, slave=True)
+            ursina.destroy(new_bullet, delay=2)
+        else:
+            pass
 
 
 def receive():
