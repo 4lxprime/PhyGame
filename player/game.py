@@ -3,11 +3,13 @@ import os
 import sys
 import socket
 import threading
+from turtle import circle, color
 import ursina
 from ursina.prefabs.first_person_controller import FirstPersonController
 import random
 import json
-from conf import player, bullet, map as cmap
+from conf import player as cplayer, bullet as cbullet, map as cmap, game as cgame
+import time
 
 
 
@@ -62,11 +64,11 @@ class Player(FirstPersonController):
         super().__init__(
             position=position,
             model="cube",
-            jump_height=player.jump_height,
-            jump_duration=player.jump_duration,
+            jump_height=cplayer.jump_height,
+            jump_duration=cplayer.jump_duration,
             origin_y=-2,
             collider="box",
-            speed=player.speed
+            speed=cplayer.speed
         )
         self.cursor.color=ursina.color.rgb(255, 0, 0, 122)
 
@@ -76,7 +78,7 @@ class Player(FirstPersonController):
             scale=ursina.Vec3(0.1, 0.2, 0.65),
             rotation=ursina.Vec3(-20, -20, -5),
             model="cube",
-            texture=os.path.join("assets", "USP45.obj"),
+            texture=cplayer.gun_texture,
             color=ursina.color.color(0, 0, 0.4)
         )
 
@@ -126,7 +128,7 @@ class Player(FirstPersonController):
 
 class Bullet(ursina.Entity):
     def __init__(self, position: ursina.Vec3, direction: float, x_direction: float, network, damage: int=random.randint(5, 20), slave=False):
-        speed=bullet.speed
+        speed=cbullet.speed
         dir_rad=ursina.math.radians(direction)
         x_dir_rad=ursina.math.radians(x_direction)
 
@@ -140,7 +142,7 @@ class Bullet(ursina.Entity):
             position=position+self.velocity / speed,
             model="sphere",
             collider="box",
-            scale=bullet.scale,
+            scale=cbullet.scale,
         )
 
         self.damage=damage
@@ -362,7 +364,7 @@ app=ursina.Ursina()
 ursina.window.borderless=False
 ursina.window.title="PhyGame 1.0"
 ursina.window.exit_button.visible=False
-ursina.camera.fov=player.fov
+ursina.camera.fov=cplayer.fov
 
 floor=Floor()
 map=Map()
@@ -456,9 +458,6 @@ def update():
         prev_dir=player.world_rotation_y
 
 
-pause_handler = ursina.Entity(ignore_paused=True)
-pause_text = ursina.Text('PAUSED', origin=(0,0), scale=2, enabled=False)
-
 def input(key):
     if key=="left mouse down" and player.health > 0:
         ursina.Audio("assets/gunshot.mp3")
@@ -466,13 +465,15 @@ def input(key):
         bullet=Bullet(b_pos, player.world_rotation_y, -player.camera_pivot.world_rotation_x, n)
         n.send_bullet(bullet)
         ursina.destroy(bullet, delay=2)
-
-def pause_handler_input(key):
-    if key == 'escape':
-        app.paused = not app.paused # Pause/unpause the game.
-        pause_text.enabled = app.paused
-
-pause_handler.input = pause_handler_input
+        
+    if key=="right mouse down" and player.health > 0:
+        ursina.camera.fov=cplayer.snipe_fov
+        
+    if key=="right mouse up" and player.health > 0:
+        ursina.camera.fov=cplayer.fov
+    
+    if key==cgame.exit_key:
+        exit(0)
 
 
 def main():
