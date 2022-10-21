@@ -3,13 +3,10 @@ import os
 import sys
 import socket
 import threading
-from turtle import circle, color
 import ursina
 from ursina.prefabs.first_person_controller import FirstPersonController
 import random
-import json
 from conf import player as cplayer, bullet as cbullet, map as cmap, game as cgame
-import time
 
 
 
@@ -111,12 +108,24 @@ class Player(FirstPersonController):
         self.world_position=ursina.Vec3(0, 7, -35)
         self.cursor.color=ursina.color.rgb(0, 0, 0, a=0)
 
-        ursina.Text(
+        self.dtext=ursina.Text(
             text="You are dead!",
             origin=ursina.Vec2(0, 0),
-            scale=3
+            scale=4
         )
-
+        
+        # the spec mode crash
+        """ursina.destroy(self.dtext)
+        self.spectext=ursina.Text(
+            text=f"You are in spectator mode if you want to restart, press {cgame.exit_key}",
+            origin=ursina.Vec2(0, 0),
+            scale=2
+        )
+        Player(ursina.Vec3(0, 3, 0)) # spec mode"""
+        
+        if cgame.auto_restart:
+            os.execl(sys.executable, sys.executable, *sys.argv)
+        
     def update(self):
         self.healthbar.scale_x=self.health / 100 * self.healthbar_size.x
 
@@ -326,11 +335,11 @@ class Floor:
 
 
 
-username="test"
+username=sys.argv[1]
 
 while True:
-    server_addr="127.0.0.1"
-    server_port=8000
+    server_addr=sys.argv[2]
+    server_port=sys.argv[3]
 
     try:
         server_port=int(server_port)
@@ -366,6 +375,11 @@ ursina.window.title="PhyGame 1.0"
 ursina.window.exit_button.visible=False
 ursina.camera.fov=cplayer.fov
 
+if cgame.limit_fps:
+    clock=app.clock
+    clock.mode=clock.MLimited
+    clock.setFrameRate(cgame.max_fps)
+    
 floor=Floor()
 map=Map()
 sky=ursina.Entity(
@@ -451,7 +465,13 @@ def update():
     if player.health > 0:
         global prev_pos, prev_dir
 
-        if prev_pos!=player.world_position or prev_dir!=player.world_rotation_y:
+        if round(prev_pos[0])!=round(player.world_position[0]) or round(prev_dir)!=round(player.world_rotation_y) or round(prev_pos[1])!=round(player.world_position[1]) or round(prev_pos[2])!=round(player.world_position[2]):
+            print(f"prev_pos: {round(prev_pos[0])}")
+            print(f"player.world_position: {round(player.world_position[0])}")
+            print(f"prev_pos: {round(prev_pos[2])}")
+            print(f"player.world_position: {round(player.world_position[2])}")
+            print(f"prev_dir: {round(prev_dir)}")
+            print(f"player.world_rotation_y: {round(player.world_rotation_y)}")
             n.send_player(player)
 
         prev_pos=player.world_position
@@ -472,6 +492,9 @@ def input(key):
     if key=="right mouse up" and player.health > 0:
         ursina.camera.fov=cplayer.fov
     
+    if key==cgame.reload_key:
+        os.execl(sys.executable, sys.executable, *sys.argv)
+    
     if key==cgame.exit_key:
         exit(0)
 
@@ -483,4 +506,7 @@ def main():
 
 
 if __name__=="__main__":
-    main()
+    if len(sys.argv)==4:
+        main()
+    else:
+        print("python3 game.py <username> <server_ip> <server_port>")

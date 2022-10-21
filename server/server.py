@@ -49,6 +49,7 @@ def handle_messages(identifier: str):
 
         try:
             msg_json = json.loads(msg_decoded)
+            print(msg_json)
         except Exception as e:
             print(e)
             continue

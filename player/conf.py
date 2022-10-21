@@ -18,4 +18,8 @@ class map():
     wall_texture="white_cube" #"assets/wall.png"
 
 class game():
-    exit_key="escape"
+    exit_key="p"
+    reload_key="escape"
+    limit_fps=False
+    max_fps=120
+    auto_restart=True
