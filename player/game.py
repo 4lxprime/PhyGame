@@ -7,6 +7,7 @@ import ursina
 from ursina.prefabs.first_person_controller import FirstPersonController
 import random
 from conf import player as cplayer, bullet as cbullet, map as cmap, game as cgame
+import time
 
 
 
@@ -176,25 +177,34 @@ class Bullet(ursina.Entity):
 class Network:
 
     def __init__(self, server_addr: str, server_port: int, username: str):
-        self.client=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.DepSrv=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.BulSrv=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.addr=server_addr
         self.port=server_port
+        self.baddr=bullet_server_addr
+        self.bport=int(bullet_server_port)
         self.username=username
         self.recv_size=2048
         self.id=0
 
     def settimeout(self, value):
-        self.client.settimeout(value)
+        self.DepSrv.settimeout(value)
+        self.BulSrv.settimeout(value)
 
     def connect(self):
 
-        self.client.connect((self.addr, self.port))
-        self.id=self.client.recv(self.recv_size).decode("utf8")
-        self.client.send(self.username.encode("utf8"))
+        self.DepSrv.connect((self.addr, self.port))
+        self.id=self.DepSrv.recv(self.recv_size).decode("utf8")
+        self.DepSrv.send(self.username.encode("utf8"))
+        
+        self.BulSrv.connect((self.baddr, self.bport))
+        self.bid=self.BulSrv.recv(self.recv_size).decode("utf8")
+        self.BulSrv.send(self.username.encode("utf8"))
 
     def receive_info(self):
         try:
-            msg=self.client.recv(self.recv_size)
+            msg=self.DepSrv.recv(self.recv_size)
+            msg=self.BulSrv.recv(self.recv_size)
         except socket.error as e:
             print(e)
 
@@ -215,8 +225,8 @@ class Network:
         player_info={
             "object": "player",
             "id": self.id,
-            "position": (player.world_x, player.world_y, player.world_z),
-            "rotation": player.rotation_y,
+            "position": (round(player.world_x, 2), round(player.world_y), round(player.world_z, 2)),
+            "rotation": round(player.rotation_y),
             "health": player.health,
             "joined": False,
             "left": False
@@ -224,7 +234,7 @@ class Network:
         player_info_encoded=json.dumps(player_info).encode("utf8")
 
         try:
-            self.client.send(player_info_encoded)
+            self.DepSrv.send(player_info_encoded)
         except socket.error as e:
             print(e)
 
@@ -240,7 +250,7 @@ class Network:
         bullet_info_encoded=json.dumps(bullet_info).encode("utf8")
 
         try:
-            self.client.send(bullet_info_encoded)
+            self.BulSrv.send(bullet_info_encoded)
         except socket.error as e:
             print(e)
 
@@ -254,7 +264,7 @@ class Network:
         health_info_encoded=json.dumps(health_info).encode("utf8")
 
         try:
-            self.client.send(health_info_encoded)
+            self.DepSrv.send(health_info_encoded)
         except socket.error as e:
             print(e)
 
@@ -275,44 +285,7 @@ class Map:
     def __init__(self):
         for y in range(1, 4, 2):
             Wall(ursina.Vec3(6, y, 0))
-            Wall(ursina.Vec3(6, y, 2))
-            Wall(ursina.Vec3(6, y, 4))
-            Wall(ursina.Vec3(6, y, 6))
-            Wall(ursina.Vec3(6, y, 8))
 
-            Wall(ursina.Vec3(4, y, 8))
-            Wall(ursina.Vec3(2, y, 8))
-            Wall(ursina.Vec3(0, y, 8))
-            Wall(ursina.Vec3(-2, y, 8))
-            
-            Wall(ursina.Vec3(4, y, 14))
-            Wall(ursina.Vec3(2, y, 14))
-            Wall(ursina.Vec3(0, y, 14))
-            Wall(ursina.Vec3(-2, y, 14))
-            
-            Wall(ursina.Vec3(0, y, -8))
-            Wall(ursina.Vec3(-2, y, -8))
-            Wall(ursina.Vec3(-4, y, -8))
-            Wall(ursina.Vec3(-6, y, -8))
-            Wall(ursina.Vec3(-8, y, -8))
-            
-            Wall(ursina.Vec3(14, y, 2))
-            Wall(ursina.Vec3(14, y, 4))
-            Wall(ursina.Vec3(14, y, 6))
-            Wall(ursina.Vec3(14, y, 8))
-            Wall(ursina.Vec3(14, y, 10))
-            
-            Wall(ursina.Vec3(-14, y, 2))
-            Wall(ursina.Vec3(-14, y, 4))
-            Wall(ursina.Vec3(-14, y, 6))
-            Wall(ursina.Vec3(-14, y, 8))
-            Wall(ursina.Vec3(-14, y, 10))
-            
-            Wall(ursina.Vec3(-14, y, -4))
-            Wall(ursina.Vec3(-14, y, -6))
-            Wall(ursina.Vec3(-14, y, -8))
-            Wall(ursina.Vec3(-14, y, -10))
-            Wall(ursina.Vec3(-14, y, -12))
 
 class FloorCube(ursina.Entity):
     def __init__(self, position):
@@ -340,6 +313,8 @@ username=sys.argv[1]
 while True:
     server_addr=sys.argv[2]
     server_port=sys.argv[3]
+    bullet_server_addr=sys.argv[4]
+    bullet_server_port=sys.argv[5]
 
     try:
         server_port=int(server_port)
@@ -466,12 +441,7 @@ def update():
         global prev_pos, prev_dir
 
         if round(prev_pos[0])!=round(player.world_position[0]) or round(prev_dir)!=round(player.world_rotation_y) or round(prev_pos[1])!=round(player.world_position[1]) or round(prev_pos[2])!=round(player.world_position[2]):
-            print(f"prev_pos: {round(prev_pos[0])}")
-            print(f"player.world_position: {round(player.world_position[0])}")
-            print(f"prev_pos: {round(prev_pos[2])}")
-            print(f"player.world_position: {round(player.world_position[2])}")
-            print(f"prev_dir: {round(prev_dir)}")
-            print(f"player.world_rotation_y: {round(player.world_rotation_y)}")
+            print(f"player: {str(player)}")
             n.send_player(player)
 
         prev_pos=player.world_position
@@ -506,7 +476,7 @@ def main():
 
 
 if __name__=="__main__":
-    if len(sys.argv)==4:
+    if len(sys.argv)==6:
         main()
     else:
-        print("python3 game.py <username> <server_ip> <server_port>")
+        print("python3 game.py <username> <server_ip> <server_port> <bullet_server_ip> <bullet_server_port>")
