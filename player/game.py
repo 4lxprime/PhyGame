@@ -204,6 +204,24 @@ class Network:
     def receive_info(self):
         try:
             msg=self.DepSrv.recv(self.recv_size)
+        except socket.error as e:
+            print(e)
+
+        if not msg:
+            return None
+
+        msg_decoded=msg.decode("utf8")
+
+        left_bracket_index=msg_decoded.index("{")
+        right_bracket_index=msg_decoded.index("}")+1
+        msg_decoded=msg_decoded[left_bracket_index:right_bracket_index]
+
+        msg_json=json.loads(msg_decoded)
+
+        return msg_json
+
+    def bullet_receive_info(self):
+        try:
             msg=self.BulSrv.recv(self.recv_size)
         except socket.error as e:
             print(e)
@@ -369,6 +387,28 @@ prev_dir=player.world_rotation_y
 enemies=[]
 
 
+def bullet_receive():
+    while True:
+        try:
+            info=n.bullet_receive_info()
+        except Exception as e:
+            print(e)
+            continue
+
+        if not info:
+            print("Server has stopped! Exiting...")
+            sys.exit()
+        
+        if info["object"]=="bullet":
+                ursina.Audio("assets/gunshot.mp3")
+                b_pos=ursina.Vec3(*info["position"])
+                b_dir=info["direction"]
+                b_x_dir=info["x_direction"]
+                b_damage=info["damage"]
+                new_bullet=Bullet(b_pos, b_dir, b_x_dir, n, b_damage, slave=True)
+                ursina.destroy(new_bullet, delay=2)
+
+
 def receive():
     while True:
         try:
@@ -407,15 +447,6 @@ def receive():
 
             enemy.world_position=ursina.Vec3(*info["position"])
             enemy.rotation_y=info["rotation"]
-
-        elif info["object"]=="bullet":
-            ursina.Audio("assets/gunshot.mp3")
-            b_pos=ursina.Vec3(*info["position"])
-            b_dir=info["direction"]
-            b_x_dir=info["x_direction"]
-            b_damage=info["damage"]
-            new_bullet=Bullet(b_pos, b_dir, b_x_dir, n, b_damage, slave=True)
-            ursina.destroy(new_bullet, delay=2)
 
         elif info["object"]=="health_update":
             enemy_id=info["id"]
@@ -472,6 +503,8 @@ def input(key):
 def main():
     msg_thread=threading.Thread(target=receive, daemon=True)
     msg_thread.start()
+    bmsg_thread=threading.Thread(target=bullet_receive, daemon=True)
+    bmsg_thread.start()
     app.run()
 
 
