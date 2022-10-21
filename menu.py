@@ -51,16 +51,32 @@ param=canvas.create_window(
     )
 )
 
+def STG():
+    But1B['bg']="#1a1d21"
+    But2B['bg']="#1e2227"
+    But3B['bg']="#1e2227"
+
+def HTG():
+    But1B['bg']="#1e2227"
+    But2B['bg']="#1a1d21"
+    But3B['bg']="#1e2227"
+
+def GI():
+    But1B['bg']="#1e2227"
+    But2B['bg']="#1e2227"
+    But3B['bg']="#1a1d21"
+
 But1B=Button(root, 
     font=("Arial", 20), 
     relief="flat", borderwidth=0, 
-    bg="#1e2227", 
+    bg="#1a1d21", 
     width=round(root.winfo_width()/49), 
     height=1, 
     highlightthickness=1, 
     highlightbackground='black', 
     fg="white", 
-    text="Start Game"
+    text="Start Game",
+    command=STG
 )
 
 But2B=Button(root, 
@@ -72,7 +88,8 @@ But2B=Button(root,
     highlightthickness=1, 
     highlightbackground='black', 
     fg="white", 
-    text="Start Game"
+    text="Host Game",
+    command=HTG
 )
 
 But3B=Button(root, 
@@ -84,7 +101,8 @@ But3B=Button(root,
     highlightthickness=1, 
     highlightbackground='black', 
     fg="white", 
-    text="Start Game"
+    text="Game Infos",
+    command=GI
 )
 
 But1=canvas.create_window(
