@@ -734,6 +734,8 @@ def act():
         But2B['width']=round(root.winfo_width()/49)
         But3B['width']=round(root.winfo_width()/49)
         canvas.coords(Ti, root.winfo_width()/2, root.winfo_height()/2)
+        for i in allsrv:
+            canvas.coords(globals()[i], root.winfo_width()/2, canvas.coords(globals()[i])[1])
     
 t=threading.Thread(target=act)
 t.setDaemon(True)
