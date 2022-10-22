@@ -5,6 +5,7 @@ $token=htmlspecialchars($_GET['token']);
 $pass=htmlspecialchars($_GET['passwd']);
 $usr=htmlspecialchars($_GET['usrnm']);
 $action=htmlspecialchars($_GET['action']);
+$ip=htmlspecialchars($_GET['ip']);
 $token=hash('sha256', $token);
 $token=hash('sha512', $token);
 $pass=hash('sha256', $pass);
@@ -14,7 +15,6 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST');
 header("Access-Control-Allow-Headers: X-Requested-With");
-$ip=$_SERVER['REMOTE_ADDR'];
 ?>
 
 <?php 
@@ -57,6 +57,7 @@ if ($urlkey===$key) {
     } else {
 
         if ($action==="create_account") {
+            
             create_acc($pass, $usr, $ip);
 
         } else {

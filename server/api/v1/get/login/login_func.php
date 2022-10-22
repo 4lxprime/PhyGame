@@ -1,10 +1,10 @@
 <?php
 
-function login($usr, $pass, $token) {
+function login($usr, $pass) {
 
     global $conn;
 
-    $sql="SELECT status FROM users WHERE username='$usr' AND password='$pass' AND token='$token'";
+    $sql="SELECT status FROM users WHERE username='$usr' AND password='$pass'";
     $result=mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result)!=0) {
