@@ -3,18 +3,18 @@
 function generateToken($usr) {
     $lenght=20;
     $usr=base64_encode($usr);
-    $char='0123456789niquecosmosNIQUECOSMOS1234567890COSMOSESTPD';
+    $char='0123456789azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN';
     $maxlenght=strlen($char);
     $randomstring='';
     for ($i = 0; $i < $lenght; $i++) {
         $randomstring .= $char[rand(0, $maxlenght - 1)];
     }
-    return "NOCTURNOISBETTER-".$usr."-".$randomstring;
+    return "PHYGAMEISBETTER-".$usr."-".$randomstring;
 }
 
 function sendD($usr, $top) {
     
-    $url="https://discord.com/api/webhooks/1019579076060643408/MiHK5Dh4lQv_khty3AfAVClWZjv7_oUuZggmU4cJnqPkPEt8idkxlykijpNvZzJEJFoV";
+    $url="https://discord.com/api/webhooks/";
     $headers=['Content-Type: application/json; charset=utf-8'];
     $post=['username' => 'Nocturno '.$top, 'content' => 'GG a '.$usr.' pour son '.$top.' !'];
     $ch=curl_init();

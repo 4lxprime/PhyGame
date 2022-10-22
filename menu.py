@@ -7,7 +7,8 @@ import random
 import os
 import requests
 
-api_url="http://127.0.0.1/phygame/api/v1"
+api_url="http://127.0.0.1/phygame"
+allsrv=[]
 
 def stop():
     root.destroy()
@@ -240,6 +241,7 @@ def get_serv():
     url=f"{api_url}/getserv.php"
     try:
         r=requests.get(url).json()
+        print(r)
         if r!="error":
             return r
         else:
@@ -289,7 +291,17 @@ cred=canvas.create_window(
     )
 )
 
+def getServ():
+    url=f"{api_url}/get/dispatch.php"
+    r=requests.get(url).json()
+    if r!="error":
+        return list(r)
+    else:
+        return False
+
 def STG():
+    for i in allsrv:
+        canvas.itemconfigure(globals()[i], state="hidden")
     But1B['bg']="#1a1d21"
     But2B['bg']="#1e2227"
     But3B['bg']="#1e2227"
@@ -304,6 +316,8 @@ def STG():
     canvas.itemconfigure(MSTxt, state="hidden")
 
 def HTG():
+    for i in allsrv:
+        canvas.itemconfigure(globals()[i], state="hidden")
     But1B['bg']="#1e2227"
     But2B['bg']="#1a1d21"
     But3B['bg']="#1e2227"
@@ -318,6 +332,8 @@ def HTG():
     canvas.itemconfigure(MSTxt, state="hidden")
 
 def GI():
+    for i in allsrv:
+        canvas.itemconfigure(globals()[i], state="hidden")
     But1B['bg']="#1e2227"
     But2B['bg']="#1e2227"
     But3B['bg']="#1a1d21"
@@ -333,6 +349,8 @@ def GI():
 
 
 def MS():
+    for i in allsrv:
+        canvas.itemconfigure(globals()[i], state="hidden")
     canvas.itemconfigure(Auto, state="hidden")
     canvas.itemconfigure(Manual, state="hidden")
     canvas.itemconfigure(IPc, state="normal")
@@ -345,6 +363,31 @@ def ConnMS():
     canvas.itemconfigure(VldIP, state="normal")
     ip=IPe.get()
     port=PORTe.get()
+    if not ip=="" or not port=="":
+        if "." in ip:
+            if int(port):
+                print("ok")
+            else:
+                canvas.itemconfigure(MSTxt, text=f"Bad Port: {port}")
+        else:
+            canvas.itemconfigure(MSTxt, text=f"Bad Ip: {ip}")
+    else:
+        canvas.itemconfigure(MSTxt, text=f"Bad Ip or Port: {ip}:{port}")
+        
+    if os.path.exists(f"{os.path.realpath(os.path.dirname(__file__))}/player/game.exe"):
+        os.startfile(f"{os.path.realpath(os.path.dirname(__file__))}/player/game.exe")
+        canvas.itemconfigure(MSTxt, text=f"Connecting To: {ip}:{port}")
+    else:
+        canvas.itemconfigure(MSTxt, text=f"Error: The games files is not in:\n{os.path.realpath(os.path.dirname(__file__))}/player/game.exe")
+
+def startGame(srv: dict):
+    ip=srv["server_ip"]
+    port=srv["server_port"]
+    plr=srv["servers_players"]
+    bull_ip=srv["bullet_server_ip"]
+    bull_port=srv["bullet_server_port"]
+    print(srv)
+    canvas.itemconfigure(MSTxt, state="normal")
     if os.path.exists(f"{os.path.realpath(os.path.dirname(__file__))}/player/game.exe"):
         os.startfile(f"{os.path.realpath(os.path.dirname(__file__))}/player/game.exe")
         canvas.itemconfigure(MSTxt, text=f"Connecting To: {ip}:{port}")
@@ -355,19 +398,35 @@ def ConnPS():
     canvas.itemconfigure(MSTxt, state="normal")
     canvas.itemconfigure(Auto, state="hidden")
     canvas.itemconfigure(Manual, state="hidden")
-    r=get_serv()
-    if r!=False:
-        ip=str(r).split(":")[0]
-        port=str(r).split(":")[1]
-        if os.path.exists(f"{os.path.realpath(os.path.dirname(__file__))}/player/game.exe"):
-            os.startfile(f"{os.path.realpath(os.path.dirname(__file__))}/player/game.exe")
-            canvas.itemconfigure(MSTxt, text=f"Connecting To: {ip}:{port}")
-        else:
-            canvas.itemconfigure(MSTxt, text=f"Error: The games files is not in:\n{os.path.realpath(os.path.dirname(__file__))}/player/game.exe")
+    res=getServ()
+    if res!=False:
+            ong=[]
+            if res!=False:
+                for i in res:
+                    ong.append("x")
+                    l=(len(ong)*60)-60
+                    globals()[f'srv_{i}']=canvas.create_window(root.winfo_width()/2, (root.winfo_height()/2)+l, 
+                        window=Button(root, 
+                            text=f"Address: {i['server_ip']}:{i['server_port']}, Players: {i['servers_players']}", 
+                            width=35, 
+                            font=("Arial", 20), 
+                            bg="#1c1c1c", 
+                            height=1, 
+                            relief="flat", 
+                            borderwidth=0, 
+                            fg="#6b6a6a", 
+                            activebackground="#3e4552",
+                            command=lambda m=dict(i): startGame(m)
+                        )
+                    )
+                    allsrv.append(f'srv_{i}')
+            else:
+                canvas.itemconfigure(MSTxt, text=f"Error")
     else:
         canvas.itemconfigure(MSTxt, text=f"Error")
 
 def HSPRV():
+    canvas.itemconfigure(MSTxt, text=f"the server has been launched but if you don't open\n your ports, you will host on your local network.")
     t0=threading.Thread(target=Server)
     t0.setDaemon(True)
     t0.start()
@@ -376,12 +435,29 @@ def HSPRV():
     t1.start()
     
 def HSPUB():
+    canvas.itemconfigure(MSTxt, text=f"the server has been launched but if you don't open\n your ports, you will host on your local network.")
     t0=threading.Thread(target=Server)
     t0.setDaemon(True)
     t0.start()
     t1=threading.Thread(target=Bullet_Server)
     t1.setDaemon(True)
     t1.start()
+
+def login():
+    usr=USRe.get()
+    passw=PASSe.get()
+    if usr=="Username" or passw=="Password":
+        print("nope")
+    else:
+        print("ok")
+        canvas.itemconfigure(USRc, state="hidden")
+        canvas.itemconfigure(PASSc, state="hidden")
+        canvas.itemconfigure(VldCONN, state="hidden")
+        canvas.itemconfigure(But1, state="normal")
+        canvas.itemconfigure(But2, state="normal")
+        canvas.itemconfigure(But3, state="normal")
+        canvas.itemconfigure(Manual, state="normal")
+        canvas.itemconfigure(Auto, state="normal")
 
 But1B=Button(root, 
     font=("Arial", 20), 
@@ -568,14 +644,75 @@ VldIP=canvas.create_window(root.winfo_width()/2, (root.winfo_height()/2)+150,
     )
 )
 
+USRe=Entry(root, 
+    text="Username", 
+    font=("Arial", 20), 
+    relief="flat", 
+    borderwidth=0, 
+    bg="#1e2227", 
+    width=20, 
+    highlightthickness=1, 
+    highlightbackground='black', 
+    fg="white"
+)
+
+PASSe=Entry(root, 
+    text="Password", 
+    font=("Arial", 20), 
+    relief="flat", 
+    borderwidth=0, 
+    bg="#1e2227", 
+    width=20, 
+    highlightthickness=1, 
+    highlightbackground='black', 
+    fg="white"
+)
+
+USRc=canvas.create_window(root.winfo_width()/2, (root.winfo_height()/2),
+    window=USRe, 
+    state="normal"
+)
+
+PASSc=canvas.create_window(root.winfo_width()/2, (root.winfo_height()/2)+50,
+    window=PASSe, 
+    state="normal"
+)
+
+VldCONN=canvas.create_window(root.winfo_width()/2, (root.winfo_height()/2)+150, 
+    state="normal",
+    window=Button(root, 
+        font=("Arial", 20), 
+        relief="flat", 
+        borderwidth=0, 
+        bg="#1e2227", 
+        width=9, 
+        highlightthickness=1, 
+        highlightbackground='black', 
+        fg="white", 
+        text="Connect",
+        command=login
+    )
+)
+
+canvas.itemconfigure(But1, state="hidden")
+canvas.itemconfigure(But2, state="hidden")
+canvas.itemconfigure(But3, state="hidden")
+canvas.itemconfigure(Manual, state="hidden")
+canvas.itemconfigure(Auto, state="hidden")
 canvas.itemconfigure(HostPub, state="hidden")
 canvas.itemconfigure(HostPrv, state="hidden")
 canvas.itemconfigure(Ti, state="hidden")
 canvas.itemconfigure(IPc, state="hidden")
 canvas.itemconfigure(PORTc, state="hidden")
 canvas.itemconfigure(VldIP, state="hidden")
+canvas.itemconfigure(USRc, state="normal")
+canvas.itemconfigure(PASSc, state="normal")
+canvas.itemconfigure(VldCONN, state="normal")
+
 IPe.insert(0, "Server IP")
 PORTe.insert(0, "Server PORT")
+USRe.insert(0, "Username")
+PASSe.insert(0, "Password")
 
 
 GPage=canvas.create_window(2, 80, anchor="nw", width=root.winfo_width()-5, height=root.winfo_height()-82)
