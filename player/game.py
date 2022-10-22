@@ -47,14 +47,14 @@ class Enemy(ursina.Entity):
 
     def update(self):
         try:
-            color_saturation=1-self.health / 100
+            color_saturation=1-self.health/100
         except AttributeError:
             self.health=100
-            color_saturation=1-self.health / 100
+            color_saturation=1-self.health/100
 
         self.color=ursina.color.color(0, color_saturation, 1)
 
-        if self.health <= 0:
+        if self.health==0:
             ursina.destroy(self)
 
 class Player(FirstPersonController):
@@ -128,7 +128,7 @@ class Player(FirstPersonController):
             os.execl(sys.executable, sys.executable, *sys.argv)
         
     def update(self):
-        self.healthbar.scale_x=self.health / 100 * self.healthbar_size.x
+        self.healthbar.scale_x=self.health/100 * self.healthbar_size.x
 
         if self.health <= 0:
             if not self.death_message_shown:
@@ -149,7 +149,7 @@ class Bullet(ursina.Entity):
         ) * speed
 
         super().__init__(
-            position=position+self.velocity / speed,
+            position=position+self.velocity/speed,
             model="sphere",
             collider="box",
             scale=cbullet.scale,
