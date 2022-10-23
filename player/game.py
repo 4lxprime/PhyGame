@@ -57,6 +57,18 @@ class Enemy(ursina.Entity):
         if self.health==0:
             ursina.destroy(self)
 
+class Gun(ursina.Entity):
+    def __init__(self, rotation: ursina.Vec3=ursina.Vec3(-20, -20, -5), visible: bool=True):
+        super().__init__(
+            parent=ursina.camera.ui,
+            position=ursina.Vec2(0.6, -0.45),
+            scale=ursina.Vec3(0.1, 0.2, 0.65),
+            rotation=rotation,
+            model="cube",
+            texture=cplayer.gun_texture,
+            visible=visible
+        )
+
 class Player(FirstPersonController):
     def __init__(self, position: ursina.Vec3):
         super().__init__(
@@ -69,16 +81,6 @@ class Player(FirstPersonController):
             speed=cplayer.speed
         )
         self.cursor.color=ursina.color.rgb(255, 0, 0, 122)
-
-        self.gun=ursina.Entity(
-            parent=ursina.camera.ui,
-            position=ursina.Vec2(0.6, -0.45),
-            scale=ursina.Vec3(0.1, 0.2, 0.65),
-            rotation=ursina.Vec3(-20, -20, -5),
-            model="cube",
-            texture=cplayer.gun_texture,
-            color=ursina.color.color(0, 0, 0.4)
-        )
 
         self.healthbar_pos=ursina.Vec2(0, 0.45)
         self.healthbar_size=ursina.Vec2(0.8, 0.04)
@@ -103,7 +105,7 @@ class Player(FirstPersonController):
     def death(self):
         self.death_message_shown=True
 
-        ursina.destroy(self.gun)
+        ursina.destroy(gun)
         self.rotation=0
         self.camera_pivot.world_rotation_x=-45
         self.world_position=ursina.Vec3(0, 7, -35)
@@ -137,7 +139,7 @@ class Player(FirstPersonController):
             super().update()
 
 class Bullet(ursina.Entity):
-    def __init__(self, position: ursina.Vec3, direction: float, x_direction: float, network, damage: int=random.randint(5, 20), slave=False):
+    def __init__(self, usr: str, position: ursina.Vec3, direction: float, x_direction: float, network, damage: int=random.randint(15, 20), slave=False):
         speed=cbullet.speed
         dir_rad=ursina.math.radians(direction)
         x_dir_rad=ursina.math.radians(x_direction)
@@ -160,6 +162,7 @@ class Bullet(ursina.Entity):
         self.x_direction=x_direction
         self.slave=slave
         self.network=network
+        self.usr=usr
 
     def update(self):
         self.position += self.velocity * ursina.time.dt
@@ -170,6 +173,8 @@ class Bullet(ursina.Entity):
                 for entity in hit_info.entities:
                     if isinstance(entity, Enemy):
                         entity.health -= self.damage
+                        if entity.health<=0:
+                            print(f"{self.usr} kill {username}")
                         self.network.send_health(entity)
 
             ursina.destroy(self)
@@ -262,7 +267,8 @@ class Network:
             "position": (bullet.world_x, bullet.world_y, bullet.world_z),
             "damage": bullet.damage,
             "direction": bullet.direction,
-            "x_direction": bullet.x_direction
+            "x_direction": bullet.x_direction,
+            "usr": self.username
         }
 
         bullet_info_encoded=json.dumps(bullet_info).encode("utf8")
@@ -420,6 +426,7 @@ sky=ursina.Entity(
     double_sided=True
 )
 player=Player(ursina.Vec3(0, 1, 0))
+gun=Gun(ursina.Vec3(-20, -20, -5), True)
 prev_pos=player.world_position
 prev_dir=player.world_rotation_y
 enemies=[]
@@ -443,11 +450,9 @@ def bullet_receive():
             b_dir=info["direction"]
             b_x_dir=info["x_direction"]
             b_damage=info["damage"]
-            new_bullet=Bullet(b_pos, b_dir, b_x_dir, n, b_damage, slave=True)
+            b_usr=info["usr"]
+            new_bullet=Bullet(b_usr, b_pos, b_dir, b_x_dir, n, b_damage, slave=True)
             ursina.destroy(new_bullet, delay=2)
-        else:
-            pass
-
 
 def receive():
     while True:
@@ -518,14 +523,21 @@ def update():
         prev_pos=player.world_position
         prev_dir=player.world_rotation_y
 
+def chgun():
+    gun.rotation=ursina.Vec3(-25, -25, -10)
+    time.sleep(0.15)
+    gun.rotation=ursina.Vec3(-20, -20, -5)
 
 def input(key):
     if key=="left mouse down" and player.health > 0:
+        if cplayer.gun_anim:
+            threading.Thread(target=chgun).start()
         ursina.Audio("assets/gunshot.mp3")
         b_pos=player.position+ursina.Vec3(0, 2, 0)
-        bullet=Bullet(b_pos, player.world_rotation_y, -player.camera_pivot.world_rotation_x, n)
+        bullet=Bullet(username, b_pos, player.world_rotation_y, -player.camera_pivot.world_rotation_x, n)
         n.send_bullet(bullet)
         ursina.destroy(bullet, delay=2)
+        
         
     if key=="right mouse down" and player.health > 0:
         ursina.camera.fov=cplayer.snipe_fov

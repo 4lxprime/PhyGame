@@ -5,7 +5,8 @@ class player():
     fov=120
     snipe_fov=40
     scope_texture="assets/scope.png"
-    gun_texture="assets/USP45.obj"
+    gun_texture="white_cube"
+    gun_anim=False
 
 class bullet():
     speed=100
