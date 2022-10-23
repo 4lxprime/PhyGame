@@ -7,6 +7,7 @@ class player():
     scope_texture="assets/scope.png"
     gun_texture="white_cube"
     gun_anim=False
+    random_spawn=True
 
 class bullet():
     speed=100

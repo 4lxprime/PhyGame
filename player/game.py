@@ -268,7 +268,7 @@ class Network:
             "damage": bullet.damage,
             "direction": bullet.direction,
             "x_direction": bullet.x_direction,
-            "usr": self.username
+            "usr": bullet.usr
         }
 
         bullet_info_encoded=json.dumps(bullet_info).encode("utf8")
@@ -300,6 +300,46 @@ class Wall(ursina.Entity):
             model="cube",
             texture=cmap.wall_texture,
             origin_y=-0.5
+        )
+        self.texture.filtering=None
+        self.collider=ursina.BoxCollider(self, size=ursina.Vec3(1, 2, 1))
+
+
+class Slide1(ursina.Entity):
+    def __init__(self, position):
+        super().__init__(
+            position=position,
+            rotation=ursina.Vec3(45, 0, 0),
+            scale=1.999,
+            model="cube",
+            texture=cmap.wall_texture,
+            origin_y=-0.412
+        )
+        self.texture.filtering=None
+        self.collider=ursina.BoxCollider(self, size=ursina.Vec3(1, 2, 1))
+
+class Slide2(ursina.Entity):
+    def __init__(self, position):
+        super().__init__(
+            position=position,
+            rotation=ursina.Vec3(45, 0, 0),
+            scale=1.998,
+            model="cube",
+            texture=cmap.wall_texture,
+            origin_y=-0.206
+        )
+        self.texture.filtering=None
+        self.collider=ursina.BoxCollider(self, size=ursina.Vec3(1, 2, 1))
+
+class Slide3(ursina.Entity):
+    def __init__(self, position):
+        super().__init__(
+            position=position,
+            rotation=ursina.Vec3(45, 0, 0),
+            scale=1.999,
+            model="cube",
+            texture=cmap.wall_texture,
+            origin_y=-0
         )
         self.texture.filtering=None
         self.collider=ursina.BoxCollider(self, size=ursina.Vec3(1, 2, 1))
@@ -347,6 +387,14 @@ class Map:
             Wall(ursina.Vec3(-14, y, -8))
             Wall(ursina.Vec3(-14, y, -10))
             Wall(ursina.Vec3(-14, y, -12))
+            
+        Slide1(ursina.Vec3(-14, 3, -13.58))
+        Slide2(ursina.Vec3(-14, 2, -14.58))
+        Slide3(ursina.Vec3(-14, 1, -15.58))
+        
+        Slide1(ursina.Vec3(4, 3, 6.4))
+        Slide2(ursina.Vec3(4, 2, 5.4))
+        Slide3(ursina.Vec3(4, 1, 4.4))
 
 
 class FloorCube(ursina.Entity):
@@ -425,7 +473,10 @@ sky=ursina.Entity(
     scale=cmap.scale,
     double_sided=True
 )
-player=Player(ursina.Vec3(0, 1, 0))
+if cplayer.random_spawn:
+    player=Player(ursina.Vec3(random.randint(0, 16), 4, random.randint(0, 16)))
+else:
+    player=Player(ursina.Vec3(0, 1, 0))
 gun=Gun(ursina.Vec3(-20, -20, -5), True)
 prev_pos=player.world_position
 prev_dir=player.world_rotation_y
