@@ -1,13 +1,10 @@
 <?php
 date_default_timezone_set('UTC');
 $urlkey=htmlspecialchars($_GET['urlkey']);
-$token=htmlspecialchars($_GET['token']);
 $pass=htmlspecialchars($_GET['passwd']);
 $usr=htmlspecialchars($_GET['usrnm']);
 $action=htmlspecialchars($_GET['action']);
 $ip=htmlspecialchars($_GET['ip']);
-$token=hash('sha256', $token);
-$token=hash('sha512', $token);
 $pass=hash('sha256', $pass);
 $pass=hash('sha512', $pass);
 $key="VEIDVOE9oN8O3C4TnU2RIN1O0rF82mU6RuJwHFQ6GH5mF4NQ3pZ8Z6R7A8dL0";
@@ -25,19 +22,19 @@ include '../../db/db_conn.php';
 
 <?php 
 if ($urlkey===$key) {
-    $sql="SELECT token FROM users WHERE username='$usr' AND password='$pass'";
+    $sql="SELECT ip FROM users WHERE username='$usr' AND password='$pass'";
     $result=mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result)!=0) {
         $row=mysqli_fetch_assoc($result);
 
-        if ($row['token']===$token) {
+        if ($row['ip']===$ip) {
 
             if ($action==="ban_user") {
-                ban($usr, $token);
+                ban($usr, $ip);
 
             } else if ($action==="unban_user") {
-                unban($usr, $token);
+                unban($usr, $ip);
 
             } else if ($action==="create_account") {
 

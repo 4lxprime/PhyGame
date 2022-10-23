@@ -14,13 +14,13 @@ $ip=$_SERVER['REMOTE_ADDR'];
 
 <?php
 
-include 'level_func.php';
+include 'kill_func.php';
 include '../../global_func.php';
 include '../../db/db_conn.php';
 
 ?>
 
-<?php 
+<?php
 
 if ($urlkey===$key) {
     

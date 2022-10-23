@@ -1,10 +1,10 @@
 <?php
 
-function ban($usr, $token) {
+function ban($usr, $ip) {
 
     global $conn;
 
-    $sql="SELECT status FROM users WHERE username='$usr' AND token='$token'";
+    $sql="SELECT status FROM users WHERE username='$usr' AND ip='$ip'";
     $result=mysqli_query($conn, $sql);
     $stat=mysqli_fetch_assoc($result);
 
@@ -13,7 +13,7 @@ function ban($usr, $token) {
         echo json_encode("already_ban", JSON_PRETTY_PRINT);
 
     } else if ($stat['status']=="normal") {
-        $sql="UPDATE users SET status='ban' WHERE username='$usr' AND token='$token'";
+        $sql="UPDATE users SET status='ban' WHERE username='$usr' AND ip='$ip'";
         $result=mysqli_query($conn, $sql);
 
         if ($result==TRUE) {
@@ -27,11 +27,11 @@ function ban($usr, $token) {
     }
 }
 
-function unban($usr, $token) {
+function unban($usr, $ip) {
     
     global $conn;
 
-    $sql="SELECT status FROM users WHERE username='$usr' AND token='$token'";
+    $sql="SELECT status FROM users WHERE username='$usr' AND ip='$ip'";
     $result=mysqli_query($conn, $sql);
     $stat=mysqli_fetch_assoc($result);
 
@@ -40,7 +40,7 @@ function unban($usr, $token) {
         echo json_encode("already_unban", JSON_PRETTY_PRINT);
 
     } else if ($stat['status']=="ban") {
-        $sql="UPDATE users SET status='normal' WHERE username='$usr' AND token='$token'";
+        $sql="UPDATE users SET status='normal' WHERE username='$usr' AND ip='$ip'";
         $result=mysqli_query($conn, $sql);
 
         if ($result==TRUE) {

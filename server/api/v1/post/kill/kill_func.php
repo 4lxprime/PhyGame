@@ -11,7 +11,7 @@ function add_kill($usr) {
     $nkill=$row['kills'];
     $lkill=$nkill+1;
 
-    $sql="UPDATE users SET kill='$lkill' WHERE username='$usr'";
+    $sql="UPDATE users SET kills='$lkill' WHERE username='$usr'";
     $result=mysqli_query($conn, $sql);
 
     if ($result==TRUE) {

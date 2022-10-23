@@ -313,7 +313,7 @@ def STG():
     canvas.itemconfigure(IPc, state="hidden")
     canvas.itemconfigure(PORTc, state="hidden")
     canvas.itemconfigure(VldIP, state="hidden")
-    canvas.itemconfigure(MSTxt, state="hidden")
+    canvas.itemconfigure(MSTxt, state="hidden", text="")
 
 def HTG():
     for i in allsrv:
@@ -329,7 +329,7 @@ def HTG():
     canvas.itemconfigure(IPc, state="hidden")
     canvas.itemconfigure(PORTc, state="hidden")
     canvas.itemconfigure(VldIP, state="hidden")
-    canvas.itemconfigure(MSTxt, state="hidden")
+    canvas.itemconfigure(MSTxt, state="hidden", text="")
 
 def GI():
     for i in allsrv:
@@ -345,7 +345,7 @@ def GI():
     canvas.itemconfigure(IPc, state="hidden")
     canvas.itemconfigure(PORTc, state="hidden")
     canvas.itemconfigure(VldIP, state="hidden")
-    canvas.itemconfigure(MSTxt, state="hidden")
+    canvas.itemconfigure(MSTxt, state="hidden", text="")
 
 
 def MS():
@@ -356,10 +356,10 @@ def MS():
     canvas.itemconfigure(IPc, state="normal")
     canvas.itemconfigure(PORTc, state="normal")
     canvas.itemconfigure(VldIP, state="normal")
-    canvas.itemconfigure(MSTxt, state="hidden")
+    canvas.itemconfigure(MSTxt, state="hidden", text="")
 
 def ConnMS():
-    canvas.itemconfigure(MSTxt, state="normal")
+    canvas.itemconfigure(MSTxt, state="normal", text="")
     canvas.itemconfigure(VldIP, state="normal")
     ip=IPe.get()
     port=PORTe.get()
@@ -387,7 +387,7 @@ def startGame(srv: dict):
     bull_ip=srv["bullet_server_ip"]
     bull_port=srv["bullet_server_port"]
     print(srv)
-    canvas.itemconfigure(MSTxt, state="normal")
+    canvas.itemconfigure(MSTxt, state="normal", text="")
     if os.path.exists(f"{os.path.realpath(os.path.dirname(__file__))}/player/game.exe"):
         os.startfile(f"{os.path.realpath(os.path.dirname(__file__))}/player/game.exe")
         canvas.itemconfigure(MSTxt, text=f"Connecting To: {ip}:{port}")
@@ -395,7 +395,7 @@ def startGame(srv: dict):
         canvas.itemconfigure(MSTxt, text=f"Error: The games files is not in:\n{os.path.realpath(os.path.dirname(__file__))}/player/game.exe")
 
 def ConnPS():
-    canvas.itemconfigure(MSTxt, state="normal")
+    canvas.itemconfigure(MSTxt, state="normal", text="")
     canvas.itemconfigure(Auto, state="hidden")
     canvas.itemconfigure(Manual, state="hidden")
     res=getServ()
