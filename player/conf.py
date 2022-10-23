@@ -1,13 +1,13 @@
 class player():
     jump_height=2
     jump_duration=0.25
-    speed=10
+    speed=12
     fov=120
     snipe_fov=40
-    scope_texture="assets/scope.png"
     gun_texture="white_cube"
     gun_anim=False
     random_spawn=True
+    texture="" #"assets\player.png"
 
 class bullet():
     speed=100

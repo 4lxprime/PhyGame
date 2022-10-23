@@ -3,6 +3,7 @@ import os
 import sys
 import socket
 import threading
+from sympy import rotations
 import ursina
 from ursina.prefabs.first_person_controller import FirstPersonController
 import random
@@ -12,15 +13,15 @@ import time
 
 
 class Enemy(ursina.Entity):
-    def __init__(self, position: ursina.Vec3, identifier: str, username: str):
+    def __init__(self, position: ursina.Vec3, identifier: str, username: str="[UNKNOWN]"):
         super().__init__(
             position=position,
             model="cube",
             origin_y=-0.5,
             collider="box",
-            texture=os.path.join("assets", "palyer.png"),
             color=ursina.color.color(0, 0, 1),
-            scale=ursina.Vec3(1, 2, 1)
+            scale=ursina.Vec3(1, 2, 1),
+            texture=cplayer.texture
         )
 
         self.gun=ursina.Entity(
@@ -69,7 +70,7 @@ class Gun(ursina.Entity):
         )
 
 class Player(FirstPersonController):
-    def __init__(self, position: ursina.Vec3):
+    def __init__(self, position: ursina.Vec3, speed: float=cplayer.speed):
         super().__init__(
             position=position,
             model="cube",
@@ -77,7 +78,8 @@ class Player(FirstPersonController):
             jump_duration=cplayer.jump_duration,
             origin_y=-2,
             collider="box",
-            speed=cplayer.speed
+            speed=speed,
+            texture=cplayer.texture
         )
         self.cursor.color=ursina.color.rgb(255, 0, 0, 122)
 
@@ -153,7 +155,7 @@ class Bullet(ursina.Entity):
             position=position+self.velocity/speed,
             model="sphere",
             collider="box",
-            scale=cbullet.scale,
+            scale=cbullet.scale
         )
 
         self.damage=damage
