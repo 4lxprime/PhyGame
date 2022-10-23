@@ -28,8 +28,7 @@ class Enemy(ursina.Entity):
             position=ursina.Vec3(0.55, 0.5, 0.6),
             scale=ursina.Vec3(0.1, 0.2, 0.65),
             model="cube",
-            texture=os.path.join("assets", "USP45.obj"),
-            color=ursina.color.color(0, 0, 0.4)
+            texture=cplayer.gun_texture
         )
 
         self.name_tag=ursina.Text(
@@ -410,6 +409,10 @@ class Map:
         Slide1(ursina.Vec3(4, 3, 6.4))
         Slide2(ursina.Vec3(4, 2, 5.4))
         Slide3(ursina.Vec3(4, 1, 4.4))
+        
+        Slide1(ursina.Vec3(2, 3, 6.4))
+        Slide2(ursina.Vec3(2, 2, 5.4))
+        Slide3(ursina.Vec3(2, 1, 4.4))
 
 
 class FloorCube(ursina.Entity):
@@ -588,6 +591,18 @@ def update():
 
         prev_pos=player.world_position
         prev_dir=player.world_rotation_y
+    
+    if player.world_position[1]<=-100:
+        ursina.destroy(gun)
+
+        dtext=ursina.Text(
+            text="You are dead!",
+            origin=ursina.Vec2(0, 0),
+            scale=4
+        )
+        
+        if cgame.auto_restart:
+            os.execl(sys.executable, sys.executable, *sys.argv)
 
 def chgun():
     gun.rotation=ursina.Vec3(-25, -25, -10)
