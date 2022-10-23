@@ -388,9 +388,24 @@ class Map:
             Wall(ursina.Vec3(-14, y, -10))
             Wall(ursina.Vec3(-14, y, -12))
             
-        Slide1(ursina.Vec3(-14, 3, -13.58))
-        Slide2(ursina.Vec3(-14, 2, -14.58))
-        Slide3(ursina.Vec3(-14, 1, -15.58))
+            
+        Slide1(ursina.Vec3(-4, 3, -9.58))
+        Slide2(ursina.Vec3(-4, 2, -10.58))
+        Slide3(ursina.Vec3(-4, 1, -11.58))
+        
+        Slide1(ursina.Vec3(-2, 3, -9.58))
+        Slide2(ursina.Vec3(-2, 2, -10.58))
+        Slide3(ursina.Vec3(-2, 1, -11.58))
+        
+        Slide1(ursina.Vec3(-6, 3, -9.58))
+        Slide2(ursina.Vec3(-6, 2, -10.58))
+        Slide3(ursina.Vec3(-6, 1, -11.58))
+
+
+        # Slide1(ursina.Vec3(-14, 3, -13.58))
+        # Slide2(ursina.Vec3(-14, 2, -14.58))
+        # Slide3(ursina.Vec3(-14, 1, -15.58))
+        
         
         Slide1(ursina.Vec3(4, 3, 6.4))
         Slide2(ursina.Vec3(4, 2, 5.4))
