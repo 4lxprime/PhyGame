@@ -2,6 +2,7 @@ class player():
     jump_height=2
     jump_duration=0.25
     speed=12
+    sprint_speed=20
     fov=120
     snipe_fov=40
     gun_texture="white_cube"
@@ -25,4 +26,6 @@ class game():
     limit_fps=False
     max_fps=120
     auto_restart=True
-    discord_rpc_server=True
+    sprint_key="shift"
+    sprint_hold_key=False
+    # discord_rpc_server=True

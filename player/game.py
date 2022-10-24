@@ -477,6 +477,7 @@ app=ursina.Ursina()
 ursina.window.borderless=False
 ursina.window.title="PhyGame 1.0"
 ursina.window.exit_button.visible=False
+ursina.window.fps_counter.visible=False
 ursina.camera.fov=cplayer.fov
 
 if cgame.limit_fps:
@@ -500,6 +501,12 @@ gun=Gun(ursina.Vec3(-20, -20, -5), True)
 prev_pos=player.world_position
 prev_dir=player.world_rotation_y
 enemies=[]
+CordCounter=ursina.Text(
+    text=f"X:{str(round(player.world_position.x))} Y:{str(round(player.world_position.y))} Z: {str(round(player.world_position.z))}", 
+    y=.470, 
+    x=-.85, 
+    color=ursina.color.white)
+CordCounter.visible=False
 
 
 def bullet_receive():
@@ -587,7 +594,6 @@ def update():
         global prev_pos, prev_dir
 
         if round(prev_pos[0])!=round(player.world_position[0]) or round(prev_dir)!=round(player.world_rotation_y) or round(prev_pos[1])!=round(player.world_position[1]) or round(prev_pos[2])!=round(player.world_position[2]):
-            print(f"player: {str(player)}")
             n.send_player(player)
 
         prev_pos=player.world_position
@@ -611,6 +617,9 @@ def chgun():
     gun.rotation=ursina.Vec3(-20, -20, -5)
 
 def input(key):
+    
+    CordCounter.text = f"X:{str(round(player.x))} Y:{str(round(player.y))} Z: {str(round(player.z))}"
+    
     if key=="left mouse down" and player.health > 0:
         if cplayer.gun_anim:
             threading.Thread(target=chgun).start()
@@ -632,6 +641,32 @@ def input(key):
     
     if key==cgame.exit_key:
         exit(0)
+    
+    if key=="f3":
+        if ursina.window.fps_counter.visible:
+            ursina.window.fps_counter.visible=False
+            CordCounter.visible=False
+        else:
+            ursina.window.fps_counter.visible=True
+            CordCounter.visible=True
+    
+    if key=="f4":
+        if ursina.window.borderless:
+            ursina.window.borderless=False
+        else:
+            ursina.window.borderless=True
+            
+    if cgame.sprint_hold_key:
+        if ursina.held_keys[cgame.sprint_key]:
+            player.speed=cplayer.sprint_speed
+        else:
+            player.speed=cplayer.speed
+    else:
+        if key==cgame.sprint_key:
+            if player.speed==cplayer.speed:
+                player.speed=cplayer.sprint_speed
+            else:
+                player.speed=cplayer.speed
 
 
 def main():
