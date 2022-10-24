@@ -25,3 +25,4 @@ class game():
     limit_fps=False
     max_fps=120
     auto_restart=True
+    discord_rpc_server=True

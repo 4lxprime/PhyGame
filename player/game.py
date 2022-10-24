@@ -3,7 +3,6 @@ import os
 import sys
 import socket
 import threading
-from sympy import rotations
 import ursina
 from ursina.prefabs.first_person_controller import FirstPersonController
 import random
