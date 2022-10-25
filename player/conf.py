@@ -29,5 +29,5 @@ class game():
     auto_restart=True
     sprint_key="shift"
     sprint_hold_key=False
-    musics=['assets/sounds/StellarAshes.mp3']
+    music=''
     # discord_rpc_server=True

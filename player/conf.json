@@ -39,7 +39,9 @@
         "max_fps": 120,
         "auto_restart": true,
         "sprint_key": "shift",
-        "sprint_hold_key": false
+        "sprint_hold_key": false,
+        "music": "",
+        "discord_rpc_shox_server": true
 
     }
 }
