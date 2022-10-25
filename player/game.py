@@ -6,8 +6,17 @@ import threading
 import ursina
 from ursina.prefabs.first_person_controller import FirstPersonController
 import random
-from conf import player as cplayer, bullet as cbullet, map as cmap, game as cgame
 import time
+import json
+
+
+
+conf_file=open('conf.json')
+config=json.load(conf_file)
+cplayer=config['player']
+cbullet=config['bullet']
+cmap=config['map']
+cgame=config['game']
 
 
 
@@ -20,7 +29,7 @@ class Enemy(ursina.Entity):
             collider="box",
             color=ursina.color.color(0, 0, 1),
             scale=ursina.Vec3(1, 2, 1),
-            texture=cplayer.texture
+            texture=cplayer['texture']
         )
 
         self.gun=ursina.Entity(
@@ -28,7 +37,7 @@ class Enemy(ursina.Entity):
             position=ursina.Vec3(0.55, 0.5, 0.6),
             scale=ursina.Vec3(0.1, 0.2, 0.65),
             model="cube",
-            texture=cplayer.gun_texture
+            texture=cplayer['gun_texture']
         )
 
         self.name_tag=ursina.Text(
@@ -63,22 +72,22 @@ class Gun(ursina.Entity):
             position=ursina.Vec2(0.6, -0.45),
             scale=ursina.Vec3(0.1, 0.2, 0.65),
             rotation=rotation,
-            model=cplayer.gun_model,
-            texture=cplayer.gun_texture,
+            model=cplayer['gun_model'],
+            texture=cplayer['gun_texture'],
             visible=visible
         )
 
 class Player(FirstPersonController):
-    def __init__(self, position: ursina.Vec3, speed: float=cplayer.speed):
+    def __init__(self, position: ursina.Vec3, speed: float=cplayer['speed']):
         super().__init__(
             position=position,
             model="cube",
-            jump_height=cplayer.jump_height,
-            jump_duration=cplayer.jump_duration,
+            jump_height=cplayer['jump_height'],
+            jump_duration=cplayer['jump_duration'],
             origin_y=-2,
             collider="box",
             speed=speed,
-            texture=cplayer.texture
+            texture=cplayer['texture']
         )
         self.cursor.color=ursina.color.rgb(255, 0, 0, 122)
 
@@ -126,7 +135,7 @@ class Player(FirstPersonController):
         )
         Player(ursina.Vec3(0, 3, 0)) # spec mode"""
         
-        if cgame.auto_restart:
+        if cgame['auto_restart']:
             os.execl(sys.executable, sys.executable, *sys.argv)
         
     def update(self):
@@ -140,7 +149,7 @@ class Player(FirstPersonController):
 
 class Bullet(ursina.Entity):
     def __init__(self, usr: str, position: ursina.Vec3, direction: float, x_direction: float, network, damage: int=random.randint(15, 20), slave=False):
-        speed=cbullet.speed
+        speed=cbullet['speed']
         dir_rad=ursina.math.radians(direction)
         x_dir_rad=ursina.math.radians(x_direction)
 
@@ -154,7 +163,7 @@ class Bullet(ursina.Entity):
             position=position+self.velocity/speed,
             model="sphere",
             collider="box",
-            scale=cbullet.scale
+            scale=cbullet['scale']
         )
 
         self.damage=damage
@@ -298,7 +307,7 @@ class Wall(ursina.Entity):
             position=position,
             scale=2,
             model="cube",
-            texture=cmap.wall_texture,
+            texture=cmap['wall_texture'],
             origin_y=-0.5
         )
         self.texture.filtering=None
@@ -312,7 +321,7 @@ class Slide1(ursina.Entity):
             rotation=ursina.Vec3(45, 0, 0),
             scale=1.999,
             model="cube",
-            texture=cmap.wall_texture,
+            texture=cmap['wall_texture'],
             origin_y=-0.412
         )
         self.texture.filtering=None
@@ -325,7 +334,7 @@ class Slide2(ursina.Entity):
             rotation=ursina.Vec3(45, 0, 0),
             scale=1.998,
             model="cube",
-            texture=cmap.wall_texture,
+            texture=cmap['wall_texture'],
             origin_y=-0.206
         )
         self.texture.filtering=None
@@ -338,7 +347,7 @@ class Slide3(ursina.Entity):
             rotation=ursina.Vec3(45, 0, 0),
             scale=1.999,
             model="cube",
-            texture=cmap.wall_texture,
+            texture=cmap['wall_texture'],
             origin_y=-0
         )
         self.texture.filtering=None
@@ -422,7 +431,7 @@ class FloorCube(ursina.Entity):
             position=position,
             scale=2,
             model="cube",
-            texture=cmap.floor_texture,
+            texture=cmap['floor_texture'],
             collider="box"
         )
         self.texture.filtering=None
@@ -478,22 +487,22 @@ ursina.window.borderless=False
 ursina.window.title="PhyGame 1.0"
 ursina.window.exit_button.visible=False
 ursina.window.fps_counter.visible=False
-ursina.camera.fov=cplayer.fov
+ursina.camera.fov=cplayer['fov']
 
-if cgame.limit_fps:
+if cgame['limit_fps']:
     clock=app.clock
     clock.mode=clock.MLimited
-    clock.setFrameRate(cgame.max_fps)
+    clock.setFrameRate(cgame['max_fps'])
     
 floor=Floor()
 map=Map()
 sky=ursina.Entity(
     model="sphere",
-    texture=cmap.texture,
-    scale=cmap.scale,
+    texture=cmap['texture'],
+    scale=cmap['scale'],
     double_sided=True
 )
-if cplayer.random_spawn:
+if cplayer['random_spawn']:
     player=Player(ursina.Vec3(random.randint(0, 16), 4, random.randint(0, 16)))
 else:
     player=Player(ursina.Vec3(0, 1, 0))
@@ -507,8 +516,7 @@ CordCounter=ursina.Text(
     x=-.85, 
     color=ursina.color.white)
 CordCounter.visible=False
-for i in cgame.musics:
-    ursina.Audio(i)
+ursina.Audio(cgame['music'])
 
 
 def bullet_receive():
@@ -610,7 +618,7 @@ def update():
             scale=4
         )
         
-        if cgame.auto_restart:
+        if cgame['auto_restart']:
             os.execl(sys.executable, sys.executable, *sys.argv)
 
 def chgun():
@@ -623,7 +631,7 @@ def input(key):
     CordCounter.text = f"X:{str(round(player.x))} Y:{str(round(player.y))} Z: {str(round(player.z))}"
     
     if key=="left mouse down" and player.health > 0:
-        if cplayer.gun_anim:
+        if cplayer['gun_anim']:
             threading.Thread(target=chgun).start()
         ursina.Audio("assets/gunshot.mp3")
         b_pos=player.position+ursina.Vec3(0, 2, 0)
@@ -633,15 +641,15 @@ def input(key):
         
         
     if key=="right mouse down" and player.health > 0:
-        ursina.camera.fov=cplayer.snipe_fov
+        ursina.camera.fov=cplayer['snipe_fov']
         
     if key=="right mouse up" and player.health > 0:
-        ursina.camera.fov=cplayer.fov
+        ursina.camera.fov=cplayer['fov']
     
-    if key==cgame.reload_key:
+    if key==cgame['reload_key']:
         os.execl(sys.executable, sys.executable, *sys.argv)
     
-    if key==cgame.exit_key:
+    if key==cgame['exit_key']:
         exit(0)
     
     if key=="f3":
@@ -658,17 +666,17 @@ def input(key):
         else:
             ursina.window.borderless=True
             
-    if cgame.sprint_hold_key:
-        if ursina.held_keys[cgame.sprint_key]:
-            player.speed=cplayer.sprint_speed
+    if cgame['sprint_hold_key']:
+        if ursina.held_keys[cgame['sprint_key']]:
+            player.speed=cplayer['sprint_speed']
         else:
-            player.speed=cplayer.speed
+            player.speed=cplayer['speed']
     else:
-        if key==cgame.sprint_key:
-            if player.speed==cplayer.speed:
-                player.speed=cplayer.sprint_speed
+        if key==cgame['sprint_key']:
+            if player.speed==cplayer['speed']:
+                player.speed=cplayer['sprint_speed']
             else:
-                player.speed=cplayer.speed
+                player.speed=cplayer['speed']
 
 
 def main():
