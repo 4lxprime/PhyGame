@@ -63,7 +63,7 @@ class Gun(ursina.Entity):
             position=ursina.Vec2(0.6, -0.45),
             scale=ursina.Vec3(0.1, 0.2, 0.65),
             rotation=rotation,
-            model="cube",
+            model=cplayer.gun_model,
             texture=cplayer.gun_texture,
             visible=visible
         )
@@ -507,6 +507,8 @@ CordCounter=ursina.Text(
     x=-.85, 
     color=ursina.color.white)
 CordCounter.visible=False
+for i in cgame.musics:
+    ursina.Audio(i)
 
 
 def bullet_receive():

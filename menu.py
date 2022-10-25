@@ -1,3 +1,4 @@
+from imaplib import Commands
 from tkinter import *
 import threading
 import socket
@@ -251,13 +252,13 @@ def get_serv():
 
 root=Tk()
 
-root.geometry("800x500")
-root.minsize(800, 500)
+root.geometry("1000x500")
+root.minsize(1000, 500)
 root.title("  PhyGame 1.2")
 
 canvas=Canvas(root, 
     bg="#23272e", 
-    width=800,
+    width=1000,
     height=500
 )
 
@@ -450,6 +451,7 @@ def login():
         print("nope")
     else:
         print("ok")
+        canvas.itemconfigure(paramB, state="normal")
         canvas.itemconfigure(USRc, state="hidden")
         canvas.itemconfigure(PASSc, state="hidden")
         canvas.itemconfigure(VldCONN, state="hidden")
@@ -458,6 +460,172 @@ def login():
         canvas.itemconfigure(But3, state="normal")
         canvas.itemconfigure(Manual, state="normal")
         canvas.itemconfigure(Auto, state="normal")
+
+class param():
+    def __init__(self):
+        self.top=Toplevel(root)
+        self.top.geometry("800x500")
+        self.top.minsize(800, 500)
+        self.top.maxsize(800, 500)
+        self.top.title("  PhyGame 1.2 Parameters")
+
+        self.Tcanvas=Canvas(self.top, 
+            bg="#23272e", 
+            width=800,
+            height=500
+        )
+        
+        self.Tcanvas.pack(fill="both", expand=False)
+
+        self.Ttop=self.Tcanvas.create_rectangle(
+            0, 0, 
+            self.top.maxsize()[0], 80,
+            outline="black", 
+            fill="#1c1c1c"
+        )
+
+        self.top.update()
+
+        self.TTt=self.Tcanvas.create_text(self.top.winfo_width()/2, 40, 
+            text="PhyGame Parameters", 
+            font=('Helvetica 30 bold'), 
+            fill="white"
+        )
+
+        self.Tmid=self.Tcanvas.create_rectangle(
+            0, 133, 
+            self.top.maxsize()[0], 80,
+            outline="black", 
+            fill="#1a1d21"
+        )
+
+        self.But1=self.Tcanvas.create_window(
+            ((self.top.winfo_width()*(1/4))-self.top.winfo_width()/8), 107,
+            window=Button(self.top, 
+                font=("Arial", 20), 
+                relief="flat", borderwidth=0, 
+                bg="#1a1d21", 
+                width=round(self.top.winfo_width()/70), 
+                height=1, 
+                highlightthickness=1, 
+                highlightbackground='black', 
+                fg="white", 
+                text="Player",
+                command=""
+            ),
+            state="normal"
+        )
+        
+        self.But2=self.Tcanvas.create_window(
+            ((self.top.winfo_width()*(2/4))-self.top.winfo_width()/8), 107,
+            window=Button(self.top, 
+                font=("Arial", 20), 
+                relief="flat", borderwidth=0, 
+                bg="#1a1d21", 
+                width=round(self.top.winfo_width()/70), 
+                height=1, 
+                highlightthickness=1, 
+                highlightbackground='black', 
+                fg="white", 
+                text="Bullet",
+                command=""
+            ),
+            state="normal"
+        )
+        
+        self.But3=self.Tcanvas.create_window(
+            ((self.top.winfo_width()*(3/4))-self.top.winfo_width()/8), 107,
+            window=Button(self.top, 
+                font=("Arial", 20), 
+                relief="flat", borderwidth=0, 
+                bg="#1a1d21", 
+                width=round(self.top.winfo_width()/70), 
+                height=1, 
+                highlightthickness=1, 
+                highlightbackground='black', 
+                fg="white", 
+                text="Map",
+                command=""
+            ),
+            state="normal"
+        )
+        
+        self.But4=self.Tcanvas.create_window(
+            ((self.top.winfo_width()*(4/4))-self.top.winfo_width()/8), 107,
+            window=Button(self.top, 
+                font=("Arial", 20), 
+                relief="flat", 
+                borderwidth=0, 
+                bg="#1a1d21", 
+                width=round(self.top.winfo_width()/70), 
+                height=1, 
+                highlightthickness=1, 
+                highlightbackground='black', 
+                fg="white", 
+                text="Game",
+                command=""
+            ),
+            state="normal"
+        )
+        
+        
+        self.TPlayerJH=self.Tcanvas.create_text(
+            (self.top.winfo_width()/2)-150, (self.top.winfo_height()/2)-50, 
+            text="Jump Height (Normal=2)", 
+            font=("Arial", 20),
+            fill="white"
+        )
+        
+        self.EPlayerJHE=Entry(self.top,
+            font=("Arial", 20), 
+            relief="flat", 
+            borderwidth=0, 
+            bg="#1e2227", 
+            width=5, 
+            highlightthickness=1, 
+            highlightbackground='black', 
+            fg="white"
+        )
+        
+        self.EPlayerJH=self.Tcanvas.create_window(
+            (self.top.winfo_width()/2)+70, (self.top.winfo_height()/2)-50,
+            window=self.EPlayerJHE 
+        )
+        
+        self.BPlayerJH=self.Tcanvas.create_window(
+            (self.top.winfo_width()/2)+200, (self.top.winfo_height()/2)-50, 
+            window=Button(self.top, 
+                font=("Arial", 17), 
+                relief="flat", 
+                borderwidth=0, 
+                bg="#1a1d21", 
+                width=7, 
+                height=1, 
+                highlightthickness=1, 
+                highlightbackground='black', 
+                fg="white", 
+                text="Valid",
+                command=""
+            )
+        )
+        
+
+paramB=canvas.create_window(
+    root.winfo_width()-60, 40, 
+    window=Button(root, 
+        font=("Arial", 15), 
+        relief="flat", 
+        borderwidth=0, 
+        bg="#1e2227", 
+        width=7, 
+        highlightthickness=1, 
+        highlightbackground='black', 
+        fg="white", 
+        text="Param", 
+        command=param
+    ),
+    state="normal"
+)
 
 But1B=Button(root, 
     font=("Arial", 20), 
@@ -708,6 +876,7 @@ canvas.itemconfigure(VldIP, state="hidden")
 canvas.itemconfigure(USRc, state="normal")
 canvas.itemconfigure(PASSc, state="normal")
 canvas.itemconfigure(VldCONN, state="normal")
+canvas.itemconfigure(paramB, state="hidden")
 
 IPe.insert(0, "Server IP")
 PORTe.insert(0, "Server PORT")
@@ -726,6 +895,7 @@ def act():
         canvas.coords(HostPub, root.winfo_width()/2-150, root.winfo_height()/2)
         canvas.coords(HostPrv, root.winfo_width()/2+150, root.winfo_height()/2)
         canvas.coords(cred, root.winfo_width()-60, root.winfo_height()-30)
+        canvas.coords(paramB, root.winfo_width()-60, canvas.coords(paramB)[1])
         canvas.coords(Tt, root.winfo_width()/2, canvas.coords(Tt)[1])
         canvas.coords(But1, (root.winfo_width()*(1/3))-root.winfo_width()/6, canvas.coords(But1)[1])
         canvas.coords(But2, (root.winfo_width()*(2/3))-root.winfo_width()/6, canvas.coords(But2)[1])

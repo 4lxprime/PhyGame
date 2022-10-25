@@ -5,7 +5,8 @@ class player():
     sprint_speed=20
     fov=120
     snipe_fov=40
-    gun_texture="white_cube"
+    gun_model="assets/ar.fbx"
+    gun_texture="assets/MainWeapon_Base_color.png"
     gun_anim=False
     random_spawn=True
     texture="" #"assets\player.png"
@@ -28,4 +29,5 @@ class game():
     auto_restart=True
     sprint_key="shift"
     sprint_hold_key=False
+    musics=['assets/sounds/StellarAshes.mp3']
     # discord_rpc_server=True
