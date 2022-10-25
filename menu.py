@@ -468,6 +468,9 @@ class param():
         self.top.minsize(800, 500)
         self.top.maxsize(800, 500)
         self.top.title("  PhyGame 1.2 Parameters")
+        
+        self.conf_file=open('player/conf.json')
+        self.config=json.load(self.conf_file)
 
         self.Tcanvas=Canvas(self.top, 
             bg="#23272e", 
@@ -587,6 +590,8 @@ class param():
             fg="white"
         )
         
+        self.EPlayerJHE.insert(0, self.config['player']['jump_height'])
+        
         self.EPlayerJH=self.Tcanvas.create_window(
             (self.top.winfo_width()/2)+70, (self.top.winfo_height()/2)-50,
             window=self.EPlayerJHE 
@@ -605,9 +610,15 @@ class param():
                 highlightbackground='black', 
                 fg="white", 
                 text="Valid",
-                command=""
+                command=self.PLJH
             )
         )
+        
+    def PLJH(self):
+        print("kk")
+        self.config['player']['jump_height']=self.EPlayerJHE.get()
+        with open("player/config.json", "w") as f:
+            json.dump(self.config, f)
         
 
 paramB=canvas.create_window(
