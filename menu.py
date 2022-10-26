@@ -464,9 +464,9 @@ def login():
 class param():
     def __init__(self):
         self.top=Toplevel(root)
-        self.top.geometry("800x500")
-        self.top.minsize(800, 500)
-        self.top.maxsize(800, 500)
+        self.top.geometry("800x750")
+        self.top.minsize(800, 750)
+        self.top.maxsize(800, 750)
         self.top.title("  PhyGame 1.2 Parameters")
         
         self.conf_file=open('player/conf.json')
@@ -475,9 +475,57 @@ class param():
         self.Tcanvas=Canvas(self.top, 
             bg="#23272e", 
             width=800,
-            height=500
+            height=750
         )
-        
+
+        self.BaseParam="""{
+    "player": {
+
+        "jump_height": 2,
+        "jump_duration": 0.25,
+        "speed": 12,
+        "sprint_speed": 20,
+        "fov": 120,
+        "snipe_fov": 40,
+        "gun_model": "cube",
+        "gun_texture": "",
+        "gun_anim": false,
+        "random_spawn": true,
+        "texture": ""
+
+    },
+
+    "bullet": {
+
+        "speed": 100,
+        "scale": 1
+
+    },
+
+    "map": {
+
+        "scale": 9999,
+        "texture": "assets/sky.png",
+        "floor_texture": "white_cube",
+        "wall_texture": "white_cube"
+
+    },
+
+    "game": {
+
+        "exit_key": "p",
+        "reload_key": "escape",
+        "limit_fps": false,
+        "max_fps": 120,
+        "auto_restart": true,
+        "sprint_key": "shift",
+        "sprint_hold_key": false,
+        "music": "",
+        "discord_rpc_shox_server": true
+
+    }
+}"""
+
         self.Tcanvas.pack(fill="both", expand=False)
 
         self.Ttop=self.Tcanvas.create_rectangle(
@@ -570,54 +618,59 @@ class param():
             ),
             state="normal"
         )
+
+        n=[]
         
-        
-        self.TPlayerJH=self.Tcanvas.create_text(
-            (self.top.winfo_width()/2)-150, (self.top.winfo_height()/2)-50, 
-            text="Jump Height (Normal=2)", 
-            font=("Arial", 20),
-            fill="white"
-        )
-        
-        self.EPlayerJHE=Entry(self.top,
-            font=("Arial", 20), 
-            relief="flat", 
-            borderwidth=0, 
-            bg="#1e2227", 
-            width=5, 
-            highlightthickness=1, 
-            highlightbackground='black', 
-            fg="white"
-        )
-        
-        self.EPlayerJHE.insert(0, self.config['player']['jump_height'])
-        
-        self.EPlayerJH=self.Tcanvas.create_window(
-            (self.top.winfo_width()/2)+70, (self.top.winfo_height()/2)-50,
-            window=self.EPlayerJHE 
-        )
-        
-        self.BPlayerJH=self.Tcanvas.create_window(
-            (self.top.winfo_width()/2)+200, (self.top.winfo_height()/2)-50, 
-            window=Button(self.top, 
-                font=("Arial", 17), 
+        for i in self.config['player']:
+            name=str(i).replace("_", " ")
+            n.append('x')
+            nb=len(n)*50
+            
+            globals()[f"TPlayer{i}"]=self.Tcanvas.create_text(
+                (self.top.winfo_width()/2)-150, (self.top.winfo_height()/2)-220+nb, 
+                text=f"{name} (Normal=2)", 
+                font=("Arial", 20),
+                fill="white"
+            )
+            
+            globals()[f"EPlayer{i}E"]=Entry(self.top,
+                font=("Arial", 20), 
                 relief="flat", 
                 borderwidth=0, 
-                bg="#1a1d21", 
-                width=7, 
-                height=1, 
+                bg="#1e2227", 
+                width=5, 
                 highlightthickness=1, 
                 highlightbackground='black', 
-                fg="white", 
-                text="Valid",
-                command=self.PLJH
+                fg="white"
             )
-        )
+            
+            globals()[f"EPlayer{i}E"].insert(0, self.config['player'][i])
+            
+            globals()[f"EPlayer{i}"]=self.Tcanvas.create_window(
+                (self.top.winfo_width()/2)+70, (self.top.winfo_height()/2)-220+nb,
+                window=globals()[f"EPlayer{i}E"]
+            )
+            
+            globals()[f"BPlayer{i}"]=self.Tcanvas.create_window(
+                (self.top.winfo_width()/2)+200, (self.top.winfo_height()/2)-220+nb, 
+                window=Button(self.top, 
+                    font=("Arial", 17), 
+                    relief="flat", 
+                    borderwidth=0, 
+                    bg="#1a1d21", 
+                    width=7, 
+                    height=1, 
+                    highlightthickness=1, 
+                    highlightbackground='black', 
+                    fg="white", 
+                    text="Valid",
+                    command=lambda m=f"EPlayer{i}E": self.save(m)
+                )
+            )
         
-    def PLJH(self):
-        print("kk")
-        self.config['player']['jump_height']=self.EPlayerJHE.get()
-        with open("player/config.json", "w") as f:
+    def save(self, i):
+        self.config['player'][str(i).replace("Player", "").replace("E", "")]=globals()[i].get()
+        with open("player/conf.json", "w") as f:
             json.dump(self.config, f)
         
 
