@@ -630,7 +630,8 @@ class param():
                 (self.top.winfo_width()/2)-150, (self.top.winfo_height()/2)-220+nb, 
                 text=f"{name} (Normal=2)", 
                 font=("Arial", 20),
-                fill="white"
+                fill="white",
+                state="normal"
             )
             
             globals()[f"EPlayer{i}E"]=Entry(self.top,
@@ -672,6 +673,50 @@ class param():
         self.config['player'][str(i).replace("Player", "").replace("E", "")]=globals()[i].get()
         with open("player/conf.json", "w") as f:
             json.dump(self.config, f)
+    
+    def player(self):
+        for i in self.config['player']:
+            self.Tcanvas.itemconfigure(globals()[f"TPlayer{i}"], state="normal")
+            self.Tcanvas.itemconfigure(globals()[f"EPlayer{i}"], state="normal")
+            self.Tcanvas.itemconfigure(globals()[f"BPlayer{i}"], state="normal")
+        for x in ['bullet', 'map', 'game']:
+            for i in self.config[x]:
+                self.Tcanvas.itemconfigure(globals()[f"TPlayer{i}"], state="hidden")
+                self.Tcanvas.itemconfigure(globals()[f"EPlayer{i}"], state="hidden")
+                self.Tcanvas.itemconfigure(globals()[f"BPlayer{i}"], state="hidden")
+    
+    def bullet(self):
+        for i in self.config['bullet']:
+            self.Tcanvas.itemconfigure(globals()[f"TPlayer{i}"], state="normal")
+            self.Tcanvas.itemconfigure(globals()[f"EPlayer{i}"], state="normal")
+            self.Tcanvas.itemconfigure(globals()[f"BPlayer{i}"], state="normal")
+        for x in ['player', 'map', 'game']:
+            for i in self.config[x]:
+                self.Tcanvas.itemconfigure(globals()[f"TPlayer{i}"], state="hidden")
+                self.Tcanvas.itemconfigure(globals()[f"EPlayer{i}"], state="hidden")
+                self.Tcanvas.itemconfigure(globals()[f"BPlayer{i}"], state="hidden")
+    
+    def map(self):
+        for i in self.config['map']:
+            self.Tcanvas.itemconfigure(globals()[f"TPlayer{i}"], state="normal")
+            self.Tcanvas.itemconfigure(globals()[f"EPlayer{i}"], state="normal")
+            self.Tcanvas.itemconfigure(globals()[f"BPlayer{i}"], state="normal")
+        for x in ['bullet', 'player', 'game']:
+            for i in self.config[x]:
+                self.Tcanvas.itemconfigure(globals()[f"TPlayer{i}"], state="hidden")
+                self.Tcanvas.itemconfigure(globals()[f"EPlayer{i}"], state="hidden")
+                self.Tcanvas.itemconfigure(globals()[f"BPlayer{i}"], state="hidden")
+    
+    def game(self):
+        for i in self.config['game']:
+            self.Tcanvas.itemconfigure(globals()[f"TPlayer{i}"], state="normal")
+            self.Tcanvas.itemconfigure(globals()[f"EPlayer{i}"], state="normal")
+            self.Tcanvas.itemconfigure(globals()[f"BPlayer{i}"], state="normal")
+        for x in ['bullet', 'map', 'player']:
+            for i in self.config[x]:
+                self.Tcanvas.itemconfigure(globals()[f"TPlayer{i}"], state="hidden")
+                self.Tcanvas.itemconfigure(globals()[f"EPlayer{i}"], state="hidden")
+                self.Tcanvas.itemconfigure(globals()[f"BPlayer{i}"], state="hidden")
         
 
 paramB=canvas.create_window(
