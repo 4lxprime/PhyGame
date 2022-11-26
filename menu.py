@@ -620,6 +620,24 @@ class param():
             state="normal"
         )
         
+        self.Default=self.Tcanvas.create_window(
+            self.top.winfo_width()-60, 40, 
+            window=Button(self.top, 
+                font=("Arial", 17), 
+                relief="flat", 
+                borderwidth=0, 
+                bg="#1a1d21", 
+                width=7, 
+                height=1, 
+                highlightthickness=1, 
+                highlightbackground='black', 
+                fg="white", 
+                text="Reset",
+                command=lambda: open("player/conf.json", "w").write(self.BaseParam)
+            ),
+            state="normal"
+        )
+        
         for x in ['bullet', 'map', 'player', 'game']:
             n=[]
             for i in self.config[x]:

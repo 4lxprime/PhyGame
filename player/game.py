@@ -135,7 +135,7 @@ class Player(FirstPersonController):
         )
         Player(ursina.Vec3(0, 3, 0)) # spec mode"""
         
-        if cgame['auto_restart']:
+        if cgame['auto_restart_(0/1)']:
             os.execl(sys.executable, sys.executable, *sys.argv)
         
     def update(self):
@@ -489,7 +489,7 @@ ursina.window.exit_button.visible=False
 ursina.window.fps_counter.visible=False
 ursina.camera.fov=cplayer['fov']
 
-if cgame['limit_fps']:
+if cgame['limit_fps_(0/1)']:
     clock=app.clock
     clock.mode=clock.MLimited
     clock.setFrameRate(cgame['max_fps'])
@@ -502,7 +502,7 @@ sky=ursina.Entity(
     scale=cmap['scale'],
     double_sided=True
 )
-if cplayer['random_spawn']:
+if cplayer['random_spawn_(0/1)']:
     player=Player(ursina.Vec3(random.randint(0, 16), 4, random.randint(0, 16)))
 else:
     player=Player(ursina.Vec3(0, 1, 0))
@@ -618,7 +618,7 @@ def update():
             scale=4
         )
         
-        if cgame['auto_restart']:
+        if cgame['auto_restart_(0/1)']:
             os.execl(sys.executable, sys.executable, *sys.argv)
 
 def chgun():
@@ -631,7 +631,7 @@ def input(key):
     CordCounter.text = f"X:{str(round(player.x))} Y:{str(round(player.y))} Z: {str(round(player.z))}"
     
     if key=="left mouse down" and player.health > 0:
-        if cplayer['gun_anim']:
+        if cplayer['gun_anim_(0/1)']:
             threading.Thread(target=chgun).start()
         ursina.Audio("assets/gunshot.mp3")
         b_pos=player.position+ursina.Vec3(0, 2, 0)
@@ -666,7 +666,7 @@ def input(key):
         else:
             ursina.window.borderless=True
             
-    if cgame['sprint_hold_key']:
+    if cgame['sprint_hold_key_(0/1)']:
         if ursina.held_keys[cgame['sprint_key']]:
             player.speed=cplayer['sprint_speed']
         else:
